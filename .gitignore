@@ -1,0 +1,26 @@
+# CMake build directories
+build/
+cmake-build-*/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+install_manifest.txt
+
+# Compiled binaries
+ideas
+ideas.exe
+*.o
+*.obj
+
+# IDE specific
+.vscode/
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Backup files
+*~
+*.bak
+*.pure
