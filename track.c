@@ -854,6 +854,7 @@ void build_table(void)
 {
     float i, j;
 
+#ifdef ENABLE_SHADOWS
     for (j=0.0; j<=TABLERES*1.0; j+=1.0) {
 	for (i=0.0; i<=TABLERES*1.0; i+=1.0) {
 	    table_points[(int)j][(int)i][Z] = (i-TABLERES*1.0/2.0)/2.0;
@@ -861,6 +862,7 @@ void build_table(void)
 	    table_points[(int)j][(int)i][Y] = 0.0;
 	}
     }
+#endif
 }
 
 
@@ -904,32 +906,35 @@ void draw_table(void)
     glMaterialfv(GL_FRONT, GL_SHININESS, mat_table_shininess);
 #endif
     
+#ifdef ENABLE_SHADOWS
     
     for (l=0; l<TABLERES; l++) {
       
       glBegin(GL_TRIANGLE_STRIP);
       for (k=0; k<=TABLERES; k++) {
-#ifdef ENABLE_SHADOWS
 	glColor3ub(tablecolors[l][k],
 		   tablecolors[l][k],
 		   tablecolors[l][k]);
-#else
-	glNormal3f(0.0, 1.0, 0.0);
-#endif
 	glVertex3fv(table_points[l][k]);
 
-#ifdef ENABLE_SHADOWS
 	glColor3ub(tablecolors[l+1][k],
 		   tablecolors[l+1][k], 
 		   tablecolors[l+1][k]);
-#else
-	glNormal3f(0.0, 1.0, 0.0);
-#endif
 	glVertex3fv(table_points[l+1][k]);
 	
       }
 	glEnd();
     }
+#else
+    // Draw simple table quad with material when shadows are disabled
+    glBegin(GL_QUADS);
+    glNormal3f(0.0, 1.0, 0.0);
+    glVertex3f(-3.0, 0.0, -3.0);
+    glVertex3f(3.0, 0.0, -3.0);
+    glVertex3f(3.0, 0.0, 3.0);
+    glVertex3f(-3.0, 0.0, 3.0);
+    glEnd();
+#endif
 
     if (logo_pos[Y]>-0.33 && logo_pos[Y]<0.33) {
 	glEnable(GL_DEPTH_TEST);
