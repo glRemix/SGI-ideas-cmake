@@ -140,6 +140,11 @@ float mat_table_diffuse[] = {0.8, 0.8, 0.8, 1.0};
 float mat_table_specular[] = {0.3, 0.3, 0.3, 1.0};
 float mat_table_shininess[] = {10.0};
 
+float mat_paper_ambient[] = {0.3, 0.25, 0.1, 1.0};
+float mat_paper_diffuse[] = {0.9, 0.85, 0.5, 1.0};
+float mat_paper_specular[] = {0.2, 0.2, 0.1, 1.0};
+float mat_paper_shininess[] = {8.0};
+
 float mat_text_start_ambient[] = {0.0, 0.0, 0.0, 1.0};
 float mat_text_start_diffuse[] = {0.0, 0.0, 0.0, 1.0};
 float mat_text_end_ambient[] = {0.2, 0.2, 0.2, 1.0};
@@ -900,8 +905,20 @@ void draw_table(void)
     }
 #else
     // Set material for table when shadows are disabled
-    glMaterialfv(GL_FRONT, GL_AMBIENT, mat_table_ambient);
-    glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_table_diffuse);
+    // Animate table to turn black (no lighting effect) like in shadow version
+    if (current_time>TIME*1.0-5.0) {
+	c = (current_time-(TIME*1.0-5.0))/2.0;
+	if (c > 1.0f) c = 1.0f;  // Clamp to prevent material from changing back
+	// Invert animation: start with lit, fade to black (opposite of text fading to white)
+	float c_inv = 1.0f - c;
+	float ambient[] = {mat_table_ambient[0]*c_inv, mat_table_ambient[1]*c_inv, mat_table_ambient[2]*c_inv, 1.0f};
+	float diffuse[] = {mat_table_diffuse[0]*c_inv, mat_table_diffuse[1]*c_inv, mat_table_diffuse[2]*c_inv, 1.0f};
+	glMaterialfv(GL_FRONT, GL_AMBIENT, ambient);
+	glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse);
+    } else {
+	glMaterialfv(GL_FRONT, GL_AMBIENT, mat_table_ambient);
+	glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_table_diffuse);
+    }
     glMaterialfv(GL_FRONT, GL_SPECULAR, mat_table_specular);
     glMaterialfv(GL_FRONT, GL_SHININESS, mat_table_shininess);
 #endif
@@ -943,10 +960,22 @@ void draw_table(void)
     pca = 0.0;
 #ifndef ENABLE_SHADOWS
     // Set material for paper when shadows are disabled
-    glMaterialfv(GL_FRONT, GL_AMBIENT, mat_table_ambient);
-    glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_table_diffuse);
-    glMaterialfv(GL_FRONT, GL_SPECULAR, mat_table_specular);
-    glMaterialfv(GL_FRONT, GL_SHININESS, mat_table_shininess);
+    // Animate paper to turn black like table
+    if (current_time>TIME*1.0-5.0) {
+	c = (current_time-(TIME*1.0-5.0))/2.0;
+	if (c > 1.0f) c = 1.0f;  // Clamp to prevent material from changing back
+	// Invert animation: start with lit, fade to black (opposite of text fading to white)
+	float c_inv = 1.0f - c;
+	float ambient[] = {mat_paper_ambient[0]*c_inv, mat_paper_ambient[1]*c_inv, mat_paper_ambient[2]*c_inv, 1.0f};
+	float diffuse[] = {mat_paper_diffuse[0]*c_inv, mat_paper_diffuse[1]*c_inv, mat_paper_diffuse[2]*c_inv, 1.0f};
+	glMaterialfv(GL_FRONT, GL_AMBIENT, ambient);
+	glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse);
+    } else {
+	glMaterialfv(GL_FRONT, GL_AMBIENT, mat_paper_ambient);
+	glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_paper_diffuse);
+    }
+    glMaterialfv(GL_FRONT, GL_SPECULAR, mat_paper_specular);
+    glMaterialfv(GL_FRONT, GL_SHININESS, mat_paper_shininess);
 #endif
     glBegin(GL_POLYGON);
     for (i=0; i<4; i++) {
@@ -974,7 +1003,7 @@ void draw_table(void)
 
     glPushMatrix();
     glRotatef (0.1 * (-184), 0.0, 1.0, 0.0);
-    glTranslatef(-0.3, 0.01, -0.8);
+    glTranslatef(-0.3, 0.005, -0.8);
     glRotatef (0.1 * (-900), 1.0, 0.0, 0.0);
     glScalef(0.015, 0.015, 0.015);
 
