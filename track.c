@@ -461,7 +461,8 @@ int main(int argc, char **argv)
       break;
     case 'r':	/* Resolution */
       if (i + 1 < argc) {
-        if (sscanf(argv[++i], "%dx%d", &window_width, &window_height) != 2) {
+        i++;
+        if (sscanf(argv[i], "%dx%d", &window_width, &window_height) != 2) {
           fprintf(stderr, "Invalid resolution format. Use WIDTHxHEIGHT (e.g., 800x600)\n");
           ideas_usage();
           exit(1);
