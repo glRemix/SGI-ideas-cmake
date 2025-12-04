@@ -133,6 +133,7 @@ void draw_h(void) {
 	glVertex2fv(h_data[41]);
     glEnd();
 
+#ifdef ENABLE_LETTER_OUTLINES
     glBegin(GL_LINE_STRIP);
 	glVertex2fv(h_data[0]);
 	glVertex2fv(h_data[2]);
@@ -182,6 +183,7 @@ void draw_h(void) {
 	glVertex2fv(h_data[16]);
 	glVertex2fv(h_data[15]);
     glEnd();
+#endif
 
 }
 

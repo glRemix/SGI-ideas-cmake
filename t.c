@@ -119,6 +119,7 @@ void draw_t(void) {
 	glVertex2fv(t_data[32]);
     glEnd();
 
+#ifdef ENABLE_LETTER_OUTLINES
     glBegin(GL_LINE_STRIP);
 	glVertex2fv(t_data[0]);
 	glVertex2fv(t_data[2]);
@@ -160,6 +161,7 @@ void draw_t(void) {
 	glVertex2fv(t_data[27]);
 	glVertex2fv(t_data[25]);
     glEnd();
+#endif
 
 }
 

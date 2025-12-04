@@ -111,6 +111,7 @@ void draw_o(void) {
 	glVertex2fv(o_data[32]);
     glEnd();
 
+#ifdef ENABLE_LETTER_OUTLINES
     glBegin(GL_LINE_STRIP);
 	glVertex2fv(o_data[0]);
 	glVertex2fv(o_data[2]);
@@ -146,6 +147,7 @@ void draw_o(void) {
 	glVertex2fv(o_data[3]);
 	glVertex2fv(o_data[1]);
     glEnd();
+#endif
 
 }
 

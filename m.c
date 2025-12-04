@@ -98,6 +98,7 @@ float m_data[][2] = {
 
 void draw_m(void) {
 
+#ifdef ENABLE_LETTER_OUTLINES
     glBegin(GL_LINE_STRIP);
 	glVertex2fv(m_data[0]);
 	glVertex2fv(m_data[2]);
@@ -160,6 +161,7 @@ void draw_m(void) {
 	glVertex2fv(m_data[33]);
 	glVertex2fv(m_data[31]);
     glEnd();
+#endif
 
     glBegin(GL_TRIANGLE_STRIP);
 	glVertex2fv(m_data[0]);

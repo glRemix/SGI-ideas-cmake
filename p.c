@@ -131,6 +131,7 @@ void draw_p(void) {
 	glVertex2fv(p_data[40]);
     glEnd();
 
+#ifdef ENABLE_LETTER_OUTLINES
     glBegin(GL_LINE_STRIP);
 	glVertex2fv(p_data[0]);
 	glVertex2fv(p_data[2]);
@@ -179,6 +180,7 @@ void draw_p(void) {
 	glVertex2fv(p_data[16]);
 	glVertex2fv(p_data[15]);
     glEnd();
+#endif
 
 }
 

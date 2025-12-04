@@ -3,6 +3,9 @@ project(ideas C)
 
 set(CMAKE_C_STANDARD 99)
 
+option(ENABLE_SHADOWS "Enable shadow rendering" OFF)
+option(ENABLE_LETTER_OUTLINES "Enable letter outline rendering" OFF)
+
 # Configure freeglut to build as static library
 set(FREEGLUT_BUILD_STATIC_LIBS ON CACHE BOOL "" FORCE)
 set(FREEGLUT_BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
@@ -54,6 +57,14 @@ target_link_libraries(ideas PRIVATE
     OpenGL::GL
     OpenGL::GLU
 )
+
+if(ENABLE_SHADOWS)
+    target_compile_definitions(ideas PRIVATE ENABLE_SHADOWS)
+endif()
+
+if(ENABLE_LETTER_OUTLINES)
+    target_compile_definitions(ideas PRIVATE ENABLE_LETTER_OUTLINES)
+endif()
 
 # Platform-specific settings
 if(WIN32)

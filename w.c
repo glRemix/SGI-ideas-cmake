@@ -169,6 +169,7 @@ void draw_w(void) {
 	glVertex2fv(w_data[55]);
     glEnd();
 
+#ifdef ENABLE_LETTER_OUTLINES
     glBegin(GL_LINE_STRIP);
 	glVertex2fv(w_data[0]);
 	glVertex2fv(w_data[2]);
@@ -240,6 +241,7 @@ void draw_w(void) {
 	glVertex2fv(w_data[40]);
 	glVertex2fv(w_data[39]);
     glEnd();
+#endif
 
 }
 

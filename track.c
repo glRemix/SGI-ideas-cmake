@@ -135,6 +135,18 @@ float mat_hemisphere_diffuse[] = {1.0, 0.2, 0.2,1.0 };
 float mat_hemisphere_specular[] = {0.5, 0.5, 0.5,1.0 };
 float mat_hemisphere_shininess[] = {20.0};
 
+float mat_table_ambient[] = {0.2, 0.2, 0.2, 1.0};
+float mat_table_diffuse[] = {0.8, 0.8, 0.8, 1.0};
+float mat_table_specular[] = {0.3, 0.3, 0.3, 1.0};
+float mat_table_shininess[] = {10.0};
+
+float mat_text_start_ambient[] = {0.0, 0.0, 0.0, 1.0};
+float mat_text_start_diffuse[] = {0.0, 0.0, 0.0, 1.0};
+float mat_text_end_ambient[] = {0.2, 0.2, 0.2, 1.0};
+float mat_text_end_diffuse[] = {1.0, 1.0, 1.0, 1.0};
+float mat_text_specular[] = {0.0, 0.0, 0.0, 1.0};
+float mat_text_shininess[] = {0.0};
+
 GLubyte stipple[32*32];
 
 typedef float vector[3];
@@ -264,10 +276,10 @@ vector table_points[TABLERES+1][TABLERES+1];
 int tablecolors[TABLERES+1][TABLERES+1];
 
 vector paper_points[4] = {
-    {-0.8, 0.0, 0.4},
-    {-0.2, 0.0, -1.4},
-    {1.0, 0.0, -1.0},
-    {0.4, 0.0, 0.8},
+    {-0.8, 0.001, 0.4},
+    {-0.2, 0.001, -1.4},
+    {1.0, 0.001, -1.0},
+    {0.4, 0.001, 0.8},
 };
 
 float dot(vector, vector);
@@ -600,17 +612,26 @@ void display(void)
     glColor3ub(0,  0,  0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
     
-    /*
-     * SHADOW
-     */
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     gluLookAt(view_from[X], view_from[Y], view_from[Z], 
 	      view_to[X], view_to[Y], view_to[Z],
 	      0.0, 1.0, 0.0);
     
+    glEnable(GL_LIGHT0);
+#ifndef ENABLE_SHADOWS
+    glEnable(GL_LIGHTING);
+#endif
     if (view_from[Y] > 0.0) draw_table();
+    glDisable(GL_LIGHT0);
+#ifndef ENABLE_SHADOWS
+    glDisable(GL_LIGHTING);
+#endif
 
+#ifdef ENABLE_SHADOWS
+    /*
+     * SHADOW
+     */
     glEnable(GL_CULL_FACE); 
     glDisable(GL_DEPTH_TEST); 
 
@@ -675,6 +696,7 @@ void display(void)
     /*
      * DONE SHADOW 
      */
+#endif
 
 
     glEnable(GL_DEPTH_TEST);
@@ -850,7 +872,6 @@ void draw_table(void)
     float ov[3], lv[3];
 
     glDisable(GL_DEPTH_TEST);
-    glDisable(GL_LIGHTING);
 
     ov[X] = light_pos[X]-logo_pos[X];
     ov[Y] = light_pos[Y]-logo_pos[Y];
@@ -858,6 +879,8 @@ void draw_table(void)
 
     normalize(ov);
 
+#ifdef ENABLE_SHADOWS
+    glDisable(GL_LIGHTING);
     for (j=0; j<=TABLERES; j++) {
       for (i=0; i<=TABLERES; i++) {
 	lv[X] = light_pos[X] - table_points[j][i][X];
@@ -873,20 +896,35 @@ void draw_table(void)
 	tablecolors[j][i] = (int)c;
       }
     }
+#else
+    // Set material for table when shadows are disabled
+    glMaterialfv(GL_FRONT, GL_AMBIENT, mat_table_ambient);
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_table_diffuse);
+    glMaterialfv(GL_FRONT, GL_SPECULAR, mat_table_specular);
+    glMaterialfv(GL_FRONT, GL_SHININESS, mat_table_shininess);
+#endif
     
     
     for (l=0; l<TABLERES; l++) {
       
       glBegin(GL_TRIANGLE_STRIP);
       for (k=0; k<=TABLERES; k++) {
+#ifdef ENABLE_SHADOWS
 	glColor3ub(tablecolors[l][k],
 		   tablecolors[l][k],
 		   tablecolors[l][k]);
+#else
+	glNormal3f(0.0, 1.0, 0.0);
+#endif
 	glVertex3fv(table_points[l][k]);
 
+#ifdef ENABLE_SHADOWS
 	glColor3ub(tablecolors[l+1][k],
 		   tablecolors[l+1][k], 
 		   tablecolors[l+1][k]);
+#else
+	glNormal3f(0.0, 1.0, 0.0);
+#endif
 	glVertex3fv(table_points[l+1][k]);
 	
       }
@@ -898,8 +936,16 @@ void draw_table(void)
     }
 
     pca = 0.0;
+#ifndef ENABLE_SHADOWS
+    // Set material for paper when shadows are disabled
+    glMaterialfv(GL_FRONT, GL_AMBIENT, mat_table_ambient);
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_table_diffuse);
+    glMaterialfv(GL_FRONT, GL_SPECULAR, mat_table_specular);
+    glMaterialfv(GL_FRONT, GL_SHININESS, mat_table_shininess);
+#endif
     glBegin(GL_POLYGON);
     for (i=0; i<4; i++) {
+#ifdef ENABLE_SHADOWS
       lv[X] = light_pos[X] - paper_points[i][X];
       lv[Y] = light_pos[Y] - paper_points[i][Y];
       lv[Z] = light_pos[Z] - paper_points[i][Z];
@@ -913,21 +959,42 @@ void draw_table(void)
       pcr = c * 255; pcg = c * 255; pcb = c * 200;
       pca += c;
       glColor3ub((int)pcr,  (int)pcg,  (int)pcb);
+#else
+      // Paper uses material when shadows are disabled
+      glNormal3f(0.0, 1.0, 0.0);
+#endif
       glVertex3fv(paper_points[i]);
     }
     glEnd();
 
     glPushMatrix();
     glRotatef (0.1 * (-184), 0.0, 1.0, 0.0);
-    glTranslatef(-0.3, 0.0, -0.8);
+    glTranslatef(-0.3, 0.01, -0.8);
     glRotatef (0.1 * (-900), 1.0, 0.0, 0.0);
     glScalef(0.015, 0.015, 0.015);
 
-
+#ifdef ENABLE_SHADOWS
     if (current_time>TIME*1.0-5.0) {
 	c = (current_time-(TIME*1.0-5.0))/2.0;
 	glColor3ub((int)(c*255.0),  (int)(c*255.0),  (int)(c*255.0));
     } else glColor3ub(0,  0,  0);
+#else
+    // Use materials for text when shadows are disabled
+    glEnable(GL_LIGHTING);
+    glEnable(GL_LIGHT0);
+    if (current_time>TIME*1.0-5.0) {
+	c = (current_time-(TIME*1.0-5.0))/2.0;
+	float ambient[] = {c*0.2f, c*0.2f, c*0.2f, 1.0f};
+	float diffuse[] = {c, c, c, 1.0f};
+	glMaterialfv(GL_FRONT, GL_AMBIENT, ambient);
+	glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse);
+    } else {
+	glMaterialfv(GL_FRONT, GL_AMBIENT, mat_text_start_ambient);
+	glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_text_start_diffuse);
+    }
+    glMaterialfv(GL_FRONT, GL_SPECULAR, mat_text_specular);
+    glMaterialfv(GL_FRONT, GL_SHININESS, mat_text_shininess);
+#endif
 
     glDisable(GL_DEPTH_TEST);
 
